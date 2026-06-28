@@ -1,1 +1,40 @@
-sonion
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Very Important Business Document</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
+
+    /* Invisible overlay to block all clicks on the video */
+    #blocker {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9999;
+      cursor: default;
+    }
+
+    iframe {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <iframe
+    src="https://www.youtube.com/embed/QDia3e12czc?autoplay=1&mute=0&controls=0&loop=1&playlist=QDia3e12czc&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowfullscreen>
+  </iframe>
+
+  <!-- Blocks all mouse interaction with the video -->
+  <div id="blocker"></div>
+
+</body>
+</html>
