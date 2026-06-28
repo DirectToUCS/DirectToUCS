@@ -1,100 +1,487 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Very Important Document</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #1a1a2e; overflow: hidden; width: 100vw; height: 100vh; font-family: Arial, sans-serif; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direct To UCS</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    #landing {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #1a1a2e;
-      z-index: 99999;
-      cursor: pointer;
-      gap: 24px;
-    }
+  :root {
+    --black: #0a0a0a;
+    --white: #ffffff;
+    --gray: #888;
+    --light: #f2f2f2;
+    --shadow: 0 2px 24px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.08);
+    --text-shadow: 0 2px 12px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.10);
+  }
 
-    #landing h1 {
-      color: #fff;
-      font-size: 2rem;
-      text-align: center;
-    }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: #fff;
+    color: var(--black);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-    #landing p {
-      color: #aaa;
-      font-size: 1rem;
-    }
+  /* ── NODE CANVAS ── */
+  #canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
 
-    #enter-btn {
-      background: #e63946;
-      color: white;
-      border: none;
-      padding: 18px 48px;
-      font-size: 1.3rem;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      box-shadow: 0 0 30px #e6394688;
-      animation: pulse 1.5s infinite;
-    }
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+  }
 
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 30px #e6394688; }
-      50% { box-shadow: 0 0 60px #e63946cc; }
-    }
+  /* ── LOGIN CARD ── */
+  .login-card {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 20px;
+    padding: 52px 48px 44px;
+    width: 420px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
 
-    #video-container {
-      display: none;
-      position: fixed;
-      inset: 0;
-    }
+  .login-card .brand {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 10px;
+    text-shadow: var(--text-shadow);
+  }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+  .login-card h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--black);
+    margin-bottom: 6px;
+    text-shadow: var(--text-shadow);
+  }
 
-    /* Blocks all clicks on the video */
-    #blocker {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-    }
-  </style>
+  .login-card .sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 36px;
+    text-shadow: var(--text-shadow);
+  }
+
+  .login-card input {
+    width: 100%;
+    border: 1.5px solid rgba(0,0,0,0.14);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    color: var(--black);
+    background: rgba(255,255,255,0.9);
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+  .login-card input:focus {
+    border-color: var(--black);
+  }
+
+  .login-card button {
+    width: 100%;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    box-shadow: var(--shadow);
+  }
+  .login-card button:hover { background: #222; }
+  .login-card button:active { transform: scale(0.98); }
+
+  /* ── BOOKING SCREEN ── */
+  #booking-screen {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 18px 36px;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  }
+
+  .topbar-logo {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar-logo .co {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gray);
+    text-shadow: var(--text-shadow);
+  }
+
+  .topbar-logo .name {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--black);
+    text-shadow: var(--text-shadow);
+    line-height: 1.1;
+  }
+
+  .topbar-logo .tagline {
+    font-size: 11px;
+    color: var(--gray);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.02em;
+    text-shadow: var(--text-shadow);
+  }
+
+  .topbar-user {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gray);
+    text-shadow: var(--text-shadow);
+  }
+
+  .booking-body {
+    margin-top: 90px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 90px);
+    padding: 40px 20px;
+  }
+
+  .booking-card {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 20px;
+    padding: 48px 48px 40px;
+    width: 520px;
+    box-shadow: var(--shadow);
+  }
+
+  .booking-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--black);
+    margin-bottom: 4px;
+    text-shadow: var(--text-shadow);
+  }
+
+  .booking-card .card-sub {
+    font-size: 13px;
+    color: var(--gray);
+    margin-bottom: 36px;
+    font-family: 'DM Mono', monospace;
+    text-shadow: var(--text-shadow);
+  }
+
+  .field-group {
+    margin-bottom: 22px;
+  }
+
+  .field-group label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+    text-shadow: var(--text-shadow);
+  }
+
+  .field-group input, .field-group select {
+    width: 100%;
+    border: 1.5px solid rgba(0,0,0,0.13);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--black);
+    background: rgba(255,255,255,0.9);
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field-group input:focus, .field-group select:focus {
+    border-color: var(--black);
+  }
+  .field-group input[readonly] {
+    background: var(--light);
+    color: var(--gray);
+    cursor: default;
+  }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--black);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.18s, transform 0.1s;
+    box-shadow: var(--shadow);
+  }
+  .submit-btn:hover { background: #222; }
+  .submit-btn:active { transform: scale(0.98); }
+
+  /* ── GLASS FILTER SVG ── */
+  .glass-svg { display: none; }
+
+  /* ── GLASS OVERLAY ── */
+  #glass-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.22;
+  }
+  #glass-overlay .glassContainer {
+    width: 100%;
+    height: 100%;
+    filter: url(#container-glass);
+  }
+
+  /* ── CONFIRM ── */
+  .confirm-banner {
+    display: none;
+    background: var(--black);
+    color: var(--white);
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    margin-top: 16px;
+    text-align: center;
+    letter-spacing: 0.04em;
+  }
+</style>
 </head>
 <body>
 
-  <div id="landing" onclick="startRoll()">
-    <h1>📄 flights</h1>
-    <p>You have been sent a very important file.</p>
-    <button id="enter-btn">Click to View</button>
-  </div>
+<!-- Node canvas -->
+<canvas id="canvas"></canvas>
 
-  <div id="video-container">
-    <iframe id="yt"
-      src=""
-      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-      allowfullscreen>
-    </iframe>
-    <div id="blocker"></div>
-  </div>
+<!-- Glass distortion overlay -->
+<div id="glass-overlay">
+  <div class="glassContainer"></div>
+</div>
 
-  <script>
-    function startRoll() {
-      document.getElementById('landing').style.display = 'none';
-      document.getElementById('video-container').style.display = 'block';
-      document.getElementById('yt').src =
-        'https://www.youtube.com/embed/QDia3e12czc?autoplay=1&controls=0&loop=1&playlist=QDia3e12czc&modestbranding=1&disablekb=1&fs=0&iv_load_policy=3';
+<!-- Glass SVG filters -->
+<svg class="glass-svg" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"/>
+      <feGaussianBlur in="noise" stdDeviation="0.02" result="blur"/>
+      <feDisplacementMap in="SourceGraphic" in2="blur" scale="77" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- LOGIN SCREEN -->
+<div class="screen" id="login-screen">
+  <div class="login-card">
+    <div class="brand">Direct To UCS</div>
+    <h1>Flight Portal</h1>
+    <p class="sub">Enter your callsign to continue</p>
+    <input type="text" id="login-username" placeholder="callsign / username" autocomplete="off"/>
+    <button onclick="doLogin()">Enter →</button>
+  </div>
+</div>
+
+<!-- BOOKING SCREEN -->
+<div class="screen hidden" id="booking-screen">
+  <div class="topbar">
+    <div class="topbar-logo">
+      <span class="co">Direct To UCS</span>
+      <span class="name">Flights</span>
+      <span class="tagline">secure transport · anytime · anywhere</span>
+    </div>
+    <div class="topbar-user">pilot: <span id="display-user"></span></div>
+  </div>
+  <div class="booking-body">
+    <div class="booking-card">
+      <h2>Request a Flight</h2>
+      <p class="card-sub">fill out the details below to dispatch</p>
+
+      <div class="field-group">
+        <label>Pickup Coordinates</label>
+        <input type="text" id="coords" placeholder="e.g. 28.5383° N, 81.3792° W" autocomplete="off"/>
+      </div>
+
+      <div class="field-group">
+        <label>Faction</label>
+        <input type="text" id="faction" placeholder="e.g. Republic, Separatist, Neutral..." autocomplete="off"/>
+      </div>
+
+      <div class="field-group">
+        <label>Pilot / Username</label>
+        <input type="text" id="booking-username" readonly/>
+      </div>
+
+      <button class="submit-btn" onclick="submitBooking()">Dispatch Flight →</button>
+      <div class="confirm-banner" id="confirm-banner">
+        ✓ Flight dispatched. Stand by for confirmation.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── NODE NETWORK BACKGROUND ──
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let nodes = [], W, H;
+const NODE_COUNT = 70;
+const MAX_DIST = 160;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+for (let i = 0; i < NODE_COUNT; i++) {
+  nodes.push({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.45,
+    vy: (Math.random() - 0.5) * 0.45,
+    r: Math.random() * 2 + 2
+  });
+}
+
+function drawNodes() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  ctx.clearRect(0, 0, W, H);
+
+  for (let n of nodes) {
+    n.x += n.vx; n.y += n.vy;
+    if (n.x < 0 || n.x > W) n.vx *= -1;
+    if (n.y < 0 || n.y > H) n.vy *= -1;
+  }
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i + 1; j < nodes.length; j++) {
+      const dx = nodes[i].x - nodes[j].x;
+      const dy = nodes[i].y - nodes[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < MAX_DIST) {
+        const alpha = (1 - dist / MAX_DIST) * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.strokeStyle = `rgba(10,10,10,${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     }
-  </script>
+  }
 
+  for (let n of nodes) {
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(10,10,10,0.55)';
+    ctx.shadowColor = 'rgba(0,0,0,0.18)';
+    ctx.shadowBlur = 6;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  requestAnimationFrame(drawNodes);
+}
+drawNodes();
+
+// ── AUTH ──
+function doLogin() {
+  const u = document.getElementById('login-username').value.trim();
+  if (!u) return;
+  localStorage.setItem('ucs_user', u);
+  document.getElementById('display-user').textContent = u;
+  document.getElementById('booking-username').value = u;
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('booking-screen').classList.remove('hidden');
+}
+
+document.getElementById('login-username').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ── BOOKING ──
+function submitBooking() {
+  const coords = document.getElementById('coords').value.trim();
+  const faction = document.getElementById('faction').value.trim();
+  if (!coords || !faction) {
+    alert('Please fill in all fields.');
+    return;
+  }
+  const banner = document.getElementById('confirm-banner');
+  banner.style.display = 'block';
+  setTimeout(() => { banner.style.display = 'none'; }, 4000);
+  document.getElementById('coords').value = '';
+  document.getElementById('faction').value = '';
+}
+
+// Auto-fill username if returning
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('ucs_user');
+  if (saved) document.getElementById('login-username').value = saved;
+});
+</script>
 </body>
 </html>
