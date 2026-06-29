@@ -3,115 +3,185 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Direct To UCS</title>
+<title>Direct To UCS — Flights</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   :root {
     --bg: #0d0d0d;
-    --surface: rgba(22,22,22,0.88);
-    --surface2: rgba(28,28,28,0.92);
+    --surface: rgba(22,22,22,0.90);
     --border: rgba(255,255,255,0.08);
     --text: #f0f0f0;
     --text-muted: #666;
-    --input-bg: rgba(255,255,255,0.05);
-    --input-border: rgba(255,255,255,0.12);
-    --input-focus: rgba(255,255,255,0.5);
     --btn-bg: #f0f0f0;
     --btn-text: #0d0d0d;
-    --btn-hover: #ffffff;
-    --readonly-bg: rgba(255,255,255,0.04);
     --shadow: 0 2px 24px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
-    --text-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
-    --node-color: rgba(220,220,220,0.6);
-    --node-line: 220,220,220;
-    --confirm-bg: #f0f0f0;
-    --confirm-text: #0d0d0d;
-    --topbar-bg: rgba(13,13,13,0.82);
+    --topbar-bg: rgba(13,13,13,0.85);
+    --input-border: rgba(255,255,255,0.12);
+    --input-bg: rgba(255,255,255,0.05);
+    --input-focus: rgba(255,255,255,0.4);
   }
   body.light {
     --bg: #ffffff;
-    --surface: rgba(255,255,255,0.82);
-    --surface2: rgba(255,255,255,0.85);
+    --surface: rgba(255,255,255,0.88);
     --border: rgba(0,0,0,0.08);
     --text: #0a0a0a;
     --text-muted: #888;
-    --input-bg: rgba(255,255,255,0.9);
-    --input-border: rgba(0,0,0,0.13);
-    --input-focus: #0a0a0a;
     --btn-bg: #0a0a0a;
     --btn-text: #ffffff;
-    --btn-hover: #222222;
-    --readonly-bg: #f2f2f2;
-    --shadow: 0 2px 24px rgba(0,0,0,0.13), 0 1px 4px rgba(0,0,0,0.08);
-    --text-shadow: 0 2px 12px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.10);
-    --node-color: rgba(10,10,10,0.55);
-    --node-line: 10,10,10;
-    --confirm-bg: #0a0a0a;
-    --confirm-text: #ffffff;
-    --topbar-bg: rgba(255,255,255,0.78);
+    --shadow: 0 2px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+    --topbar-bg: rgba(255,255,255,0.82);
+    --input-border: rgba(0,0,0,0.13);
+    --input-bg: rgba(255,255,255,0.9);
+    --input-focus: #0a0a0a;
   }
-  body { font-family: 'Space Grotesk', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; transition: background 0.3s; }
-  #canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-  .screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 10; transition: opacity 0.5s ease, transform 0.5s ease; }
-  .screen.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
 
-  /* LOGIN */
-  .login-card { background: var(--surface); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid var(--border); border-radius: 20px; padding: 52px 48px 44px; width: 420px; box-shadow: var(--shadow); text-align: center; transition: background 0.3s, border-color 0.3s; }
-  .login-card .brand { font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; text-shadow: var(--text-shadow); }
-  .login-card h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); margin-bottom: 6px; text-shadow: var(--text-shadow); }
-  .login-card .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 36px; text-shadow: var(--text-shadow); }
-  .login-card input { width: 100%; border: 1.5px solid var(--input-border); border-radius: 10px; padding: 14px 18px; font-family: 'DM Mono', monospace; font-size: 15px; color: var(--text); background: var(--input-bg); outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s; margin-bottom: 14px; }
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background 0.3s;
+  }
+
+  #canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center;
+    padding: 16px 36px;
+    background: var(--topbar-bg);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+  }
+  .topbar-logo { display: flex; flex-direction: column; }
+  .topbar-logo .co { font-size: 9px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-muted); }
+  .topbar-logo .name { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1.1; }
+  .topbar-logo .tagline { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .topbar-user { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); }
+
+  .theme-btn {
+    background: none; border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 13px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--text-muted); cursor: pointer;
+    transition: all 0.2s; letter-spacing: 0.05em;
+  }
+  .theme-btn:hover { color: var(--text); border-color: var(--input-focus); }
+
+  /* ── SCREENS ── */
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+  .screen.hidden { opacity: 0; pointer-events: none; transform: translateY(18px); }
+
+  /* ── LOGIN ── */
+  .login-wrap { position: fixed; top: 20px; right: 20px; z-index: 200; }
+  .login-wrap .theme-btn { background: var(--surface); backdrop-filter: blur(10px); }
+
+  .login-card {
+    background: var(--surface);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 52px 48px 44px;
+    width: 420px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    transition: background 0.3s;
+  }
+  .login-card .brand { font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
+  .login-card h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); margin-bottom: 6px; }
+  .login-card .sub { font-size: 13px; color: var(--text-muted); margin-bottom: 32px; }
+  .login-card input {
+    width: 100%; border: 1.5px solid var(--input-border); border-radius: 10px;
+    padding: 14px 18px; font-family: 'DM Mono', monospace; font-size: 15px;
+    color: var(--text); background: var(--input-bg);
+    outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s;
+    margin-bottom: 14px;
+  }
   .login-card input:focus { border-color: var(--input-focus); }
-  .login-card button { width: 100%; background: var(--btn-bg); color: var(--btn-text); border: none; border-radius: 10px; padding: 14px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; transition: background 0.18s, transform 0.1s; box-shadow: var(--shadow); }
-  .login-card button:hover { background: var(--btn-hover); }
+  .login-card input::placeholder { color: var(--text-muted); }
+  .login-card button {
+    width: 100%; background: var(--btn-bg); color: var(--btn-text);
+    border: none; border-radius: 10px; padding: 14px;
+    font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600;
+    letter-spacing: 0.04em; cursor: pointer;
+    transition: opacity 0.18s, transform 0.1s; box-shadow: var(--shadow);
+  }
+  .login-card button:hover { opacity: 0.85; }
   .login-card button:active { transform: scale(0.98); }
 
-  /* BOOKING */
+  /* ── BOOKING ── */
   #booking-screen { flex-direction: column; align-items: stretch; justify-content: flex-start; overflow-y: auto; }
-  .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; padding: 18px 36px; background: var(--topbar-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); box-shadow: 0 2px 16px rgba(0,0,0,0.15); transition: background 0.3s; }
-  .topbar-logo { display: flex; flex-direction: column; }
-  .topbar-logo .co { font-size: 9px; font-weight: 600; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-muted); text-shadow: var(--text-shadow); }
-  .topbar-logo .name { font-size: 20px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); text-shadow: var(--text-shadow); line-height: 1.1; }
-  .topbar-logo .tagline { font-size: 11px; color: var(--text-muted); font-family: 'DM Mono', monospace; letter-spacing: 0.02em; text-shadow: var(--text-shadow); }
-  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 18px; }
-  .topbar-user { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); text-shadow: var(--text-shadow); }
-  .booking-body { margin-top: 90px; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 90px); padding: 40px 20px; }
-  .booking-card { background: var(--surface2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 20px; padding: 48px 48px 40px; width: 540px; box-shadow: var(--shadow); transition: background 0.3s, border-color 0.3s; }
-  .booking-card h2 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; text-shadow: var(--text-shadow); }
-  .booking-card .card-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 36px; font-family: 'DM Mono', monospace; text-shadow: var(--text-shadow); }
-  .field-group { margin-bottom: 22px; }
-  .field-group label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; text-shadow: var(--text-shadow); }
-  .field-group input, .field-group select { width: 100%; border: 1.5px solid var(--input-border); border-radius: 10px; padding: 14px 18px; font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text); background: var(--input-bg); outline: none; transition: border-color 0.2s, background 0.3s, color 0.3s; appearance: none; -webkit-appearance: none; }
-  .field-group input:focus, .field-group select:focus { border-color: var(--input-focus); }
-  .field-group input[readonly] { background: var(--readonly-bg); color: var(--text-muted); cursor: default; }
-  .field-group select option { background: #1a1a1a; color: #f0f0f0; }
-  body.light .field-group select option { background: #fff; color: #0a0a0a; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .submit-btn { width: 100%; background: var(--btn-bg); color: var(--btn-text); border: none; border-radius: 10px; padding: 15px; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.04em; cursor: pointer; margin-top: 8px; transition: background 0.18s, transform 0.1s; box-shadow: var(--shadow); }
-  .submit-btn:hover { background: var(--btn-hover); }
-  .submit-btn:active { transform: scale(0.98); }
-  .submit-btn:disabled { background: #555; color: #999; cursor: not-allowed; }
-  .confirm-banner { display: none; background: var(--confirm-bg); color: var(--confirm-text); border-radius: 10px; padding: 14px 20px; font-family: 'DM Mono', monospace; font-size: 13px; margin-top: 16px; text-align: center; letter-spacing: 0.04em; }
-  .glass-svg { display: none; }
-  #glass-overlay { position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: 0.22; }
-  #glass-overlay .glassContainer { width: 100%; height: 100%; filter: url(#container-glass); }
 
-  /* THEME TOGGLE */
-  .theme-toggle { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); cursor: pointer; transition: border-color 0.2s, color 0.2s; letter-spacing: 0.05em; }
-  .theme-toggle:hover { border-color: var(--input-focus); color: var(--text); }
-  /* login screen toggle */
-  .login-theme-toggle { position: fixed; top: 20px; right: 20px; z-index: 200; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 14px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-muted); cursor: pointer; transition: all 0.2s; letter-spacing: 0.05em; backdrop-filter: blur(10px); }
-  .login-theme-toggle:hover { color: var(--text); }
+  .booking-body {
+    margin-top: 80px;
+    display: flex; align-items: flex-start; justify-content: center;
+    min-height: calc(100vh - 80px);
+    padding: 40px 20px;
+    position: relative; z-index: 10;
+  }
+
+  .booking-card {
+    background: var(--surface);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 40px 32px;
+    width: 660px;
+    max-width: 100%;
+    box-shadow: var(--shadow);
+    transition: background 0.3s;
+  }
+  .booking-card h2 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.03em; color: var(--text); margin-bottom: 4px; }
+  .booking-card .card-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 28px; font-family: 'DM Mono', monospace; }
+
+  /* ── IFRAME WRAPPER ── */
+  .form-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    /* Crop Google's header/footer */
+    height: 560px;
+  }
+
+  .form-wrap iframe {
+    width: 100%;
+    height: 760px;
+    border: none;
+    margin-top: -120px; /* hide Google header */
+    display: block;
+    /* dark mode invert trick */
+    transition: filter 0.3s;
+  }
+
+  /* Dark mode: invert the iframe so Google's white form becomes dark */
+  body:not(.light) .form-wrap iframe {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
+  /* glass-overlay */
+  #glass-overlay { position: fixed; inset: 0; z-index: 5; pointer-events: none; opacity: 0.15; }
+  #glass-overlay div { width: 100%; height: 100%; filter: url(#container-glass); }
+  .glass-svg { display: none; }
 </style>
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
 
-<div id="glass-overlay"><div class="glassContainer"></div></div>
-
-<svg class="glass-svg" xmlns="http://www.w3.org/2000/svg">
+<div id="glass-overlay"><div></div></div>
+<svg class="glass-svg">
   <defs>
     <filter id="container-glass" x="0%" y="0%" width="100%" height="100%">
       <feTurbulence type="fractalNoise" baseFrequency="0.008 0.008" numOctaves="2" seed="92" result="noise"/>
@@ -121,10 +191,12 @@
   </defs>
 </svg>
 
-<!-- Login page theme toggle -->
-<button class="login-theme-toggle" id="login-toggle" onclick="toggleTheme()">☀ light</button>
+<!-- Login page theme btn -->
+<div class="login-wrap">
+  <button class="theme-btn" id="login-theme-btn" onclick="toggleTheme()">☀ light</button>
+</div>
 
-<!-- LOGIN -->
+<!-- LOGIN SCREEN -->
 <div class="screen" id="login-screen">
   <div class="login-card">
     <div class="brand">Direct To UCS</div>
@@ -135,7 +207,7 @@
   </div>
 </div>
 
-<!-- BOOKING -->
+<!-- BOOKING SCREEN -->
 <div class="screen hidden" id="booking-screen">
   <div class="topbar">
     <div class="topbar-logo">
@@ -144,52 +216,25 @@
       <span class="tagline">secure transport · anytime · anywhere</span>
     </div>
     <div class="topbar-right">
-      <div class="topbar-user">pilot: <span id="display-user"></span></div>
-      <button class="theme-toggle" onclick="toggleTheme()" id="topbar-toggle">☀ light</button>
+      <span class="topbar-user">pilot: <span id="display-user"></span></span>
+      <button class="theme-btn" id="topbar-theme-btn" onclick="toggleTheme()">☀ light</button>
     </div>
   </div>
+
   <div class="booking-body">
     <div class="booking-card">
       <h2>Request a Flight</h2>
-      <p class="card-sub">fill out the details below to dispatch</p>
-
-      <div class="field-group">
-        <label>Pickup Coordinates</label>
-        <input type="text" id="f-cords" placeholder="e.g. 28.5383° N, 81.3792° W" autocomplete="off"/>
+      <p class="card-sub">complete the form below to dispatch your transport</p>
+      <div class="form-wrap">
+        <iframe
+          id="gform"
+          src="https://docs.google.com/forms/d/e/1FAIpQLSfHohpah3xZh8vtnS8-LtnUpeznhN7ocMuO69_xWmS1682gTQ/viewform?embedded=true"
+          frameborder="0"
+          marginheight="0"
+          marginwidth="0">
+          Loading…
+        </iframe>
       </div>
-
-      <div class="field-group">
-        <label>Faction</label>
-        <input type="text" id="f-faction" placeholder="e.g. Republic, Separatist, Neutral..." autocomplete="off"/>
-      </div>
-
-      <div class="field-row">
-        <div class="field-group">
-          <label>Day</label>
-          <select id="f-day">
-            <option value="">— select day —</option>
-            <option>Monday</option>
-            <option>Tuesday</option>
-            <option>Wednesday</option>
-            <option>Thursday</option>
-            <option>Friday</option>
-            <option>Saturday</option>
-            <option>Sunday</option>
-          </select>
-        </div>
-        <div class="field-group">
-          <label>Time</label>
-          <input type="time" id="f-time" />
-        </div>
-      </div>
-
-      <div class="field-group">
-        <label>Pilot / Username</label>
-        <input type="text" id="f-username" readonly/>
-      </div>
-
-      <button class="submit-btn" id="submit-btn" onclick="submitBooking()">Dispatch Flight →</button>
-      <div class="confirm-banner" id="confirm-banner">✓ Flight dispatched. Stand by for confirmation.</div>
     </div>
   </div>
 </div>
@@ -201,8 +246,8 @@ function toggleTheme() {
   isDark = !isDark;
   document.body.classList.toggle('light', !isDark);
   const label = isDark ? '☀ light' : '🌙 dark';
-  document.getElementById('login-toggle').textContent = label;
-  document.getElementById('topbar-toggle').textContent = label;
+  document.getElementById('login-theme-btn').textContent = label;
+  document.getElementById('topbar-theme-btn').textContent = label;
   localStorage.setItem('ucs_theme', isDark ? 'dark' : 'light');
 }
 
@@ -210,36 +255,26 @@ function toggleTheme() {
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 let nodes = [];
-const NODE_COUNT = 70, MAX_DIST = 160;
-
+const NODE_COUNT = 65, MAX_DIST = 155;
 for (let i = 0; i < NODE_COUNT; i++) {
-  nodes.push({ x: Math.random()*window.innerWidth, y: Math.random()*window.innerHeight, vx:(Math.random()-0.5)*0.45, vy:(Math.random()-0.5)*0.45, r:Math.random()*2+2 });
+  nodes.push({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, vx:(Math.random()-.5)*.45, vy:(Math.random()-.5)*.45, r:Math.random()*2+2 });
 }
-
 function drawNodes() {
-  const W = canvas.width = window.innerWidth;
-  const H = canvas.height = window.innerHeight;
+  const W = canvas.width = innerWidth, H = canvas.height = innerHeight;
   ctx.clearRect(0,0,W,H);
   const dark = !document.body.classList.contains('light');
-  const nodeColor = dark ? 'rgba(220,220,220,0.6)' : 'rgba(10,10,10,0.55)';
-  const lineBase = dark ? '220,220,220' : '10,10,10';
+  const rgb = dark ? '210,210,210' : '10,10,10';
+  const fill = dark ? 'rgba(210,210,210,0.65)' : 'rgba(10,10,10,0.55)';
   for (let n of nodes) {
     n.x += n.vx; n.y += n.vy;
     if (n.x<0||n.x>W) n.vx*=-1;
     if (n.y<0||n.y>H) n.vy*=-1;
   }
   for (let i=0;i<nodes.length;i++) for (let j=i+1;j<nodes.length;j++) {
-    const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y;
-    const dist=Math.sqrt(dx*dx+dy*dy);
-    if (dist<MAX_DIST) {
-      ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y);
-      ctx.strokeStyle=`rgba(${lineBase},${(1-dist/MAX_DIST)*0.22})`; ctx.lineWidth=1; ctx.stroke();
-    }
+    const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, d=Math.hypot(dx,dy);
+    if (d<MAX_DIST) { ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.strokeStyle=`rgba(${rgb},${(1-d/MAX_DIST)*.2})`; ctx.lineWidth=1; ctx.stroke(); }
   }
-  for (let n of nodes) {
-    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
-    ctx.fillStyle=nodeColor; ctx.shadowColor= dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.18)'; ctx.shadowBlur=6; ctx.fill(); ctx.shadowBlur=0;
-  }
+  for (let n of nodes) { ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle=fill; ctx.fill(); }
   requestAnimationFrame(drawNodes);
 }
 drawNodes();
@@ -250,69 +285,23 @@ function doLogin() {
   if (!u) return;
   localStorage.setItem('ucs_user', u);
   document.getElementById('display-user').textContent = u;
-  document.getElementById('f-username').value = u;
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('booking-screen').classList.remove('hidden');
 }
-document.getElementById('login-username').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('login-username').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
 
+// ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
-  // Restore theme (dark by default)
-  const savedTheme = localStorage.getItem('ucs_theme');
-  if (savedTheme === 'light') {
+  const t = localStorage.getItem('ucs_theme');
+  if (t === 'light') {
     isDark = false;
     document.body.classList.add('light');
-    document.getElementById('login-toggle').textContent = '🌙 dark';
-    document.getElementById('topbar-toggle').textContent = '🌙 dark';
+    document.getElementById('login-theme-btn').textContent = '🌙 dark';
+    document.getElementById('topbar-theme-btn').textContent = '🌙 dark';
   }
-  const saved = localStorage.getItem('ucs_user');
-  if (saved) document.getElementById('login-username').value = saved;
+  const u = localStorage.getItem('ucs_user');
+  if (u) document.getElementById('login-username').value = u;
 });
-
-// ── SUBMIT TO GOOGLE FORMS ──
-const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfHohpah3xZh8vtnS8-LtnUpeznhN7ocMuO69_xWmS1682gTQ/formResponse';
-
-function submitBooking() {
-  const cords    = document.getElementById('f-cords').value.trim();
-  const faction  = document.getElementById('f-faction').value.trim();
-  const day      = document.getElementById('f-day').value;
-  const timeVal  = document.getElementById('f-time').value; // "HH:MM"
-  const username = document.getElementById('f-username').value.trim();
-
-  if (!cords || !faction || !day || !timeVal) {
-    alert('Please fill in all fields.');
-    return;
-  }
-
-  const [hour, minute] = timeVal.split(':');
-
-  const body = new URLSearchParams({
-    'entry.530300241': cords,
-    'entry.453246272': faction,
-    'entry.2068471299': day,
-    'entry.611108033': username,
-    'entry.246356374_hour': hour,
-    'entry.246356374_minute': minute,
-  });
-
-  const btn = document.getElementById('submit-btn');
-  btn.disabled = true;
-  btn.textContent = 'Dispatching...';
-
-  // Google Forms doesn't allow CORS so we use a no-cors fetch (fire & forget)
-  fetch(FORM_ACTION, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() })
-    .finally(() => {
-      btn.disabled = false;
-      btn.textContent = 'Dispatch Flight →';
-      const banner = document.getElementById('confirm-banner');
-      banner.style.display = 'block';
-      setTimeout(() => banner.style.display = 'none', 4000);
-      document.getElementById('f-cords').value = '';
-      document.getElementById('f-faction').value = '';
-      document.getElementById('f-day').value = '';
-      document.getElementById('f-time').value = '';
-    });
-}
 </script>
 </body>
 </html>
